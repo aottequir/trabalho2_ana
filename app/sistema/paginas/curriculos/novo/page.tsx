@@ -1,516 +1,358 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { SetStateAction, useState } from "react"
-import { FaPlus, FaTrash } from "react-icons/fa"
-import InputMask from "react-input-mask"
-import { toast } from "sonner"
+import { useForm } from "react-hook-form";
 
-export default function Page() {
+import { yupResolver } from "@hookform/resolvers/yup";
 
-  // =========================
-  // CAMPOS PRINCIPAIS
-  // =========================
-  const [nome, setNome] = useState("")
-  const [cargo, setCargo] = useState("")
-  const [email, setEmail] = useState("")
-  const [telefone, setTelefone] = useState("")
-  const [cpf, setCpf] = useState("")
-  const [resumo, setResumo] = useState("")
+import * as yup from "yup";
 
-  // =========================
-  // EXPERIÊNCIAS
-  // =========================
-  const [experiencias, setExperiencias] = useState([
-    {
-      empresa: "",
-      cargo: ""
-    }
-  ])
+import InputMask from "react-input-mask";
 
-  // =========================
-  // FORMAÇÕES
-  // =========================
-  const [formacoes, setFormacoes] = useState([
-    {
-      instituicao: "",
-      curso: ""
-    }
-  ])
+import { toast } from "sonner";
 
-  // =========================
-  // HABILIDADES
-  // =========================
-  const [habilidades, setHabilidades] = useState<string[]>([])
-  const [novaHabilidade, setNovaHabilidade] = useState("")
+import Header from "@/componentes/header";
 
-  // =========================
-  // VALIDAÇÃO
-  // =========================
-  function validarFormulario() {
+import {
+  FaUser,
+  FaBriefcase,
+  FaEnvelope,
+  FaPhone,
+  FaIdCard,
+  FaFileAlt,
+  FaGraduationCap,
+  FaTools,
+} from "react-icons/fa";
 
-    if (
-      !nome ||
-      !cargo ||
-      !email ||
-      !telefone ||
-      !cpf ||
-      !resumo
-    ) {
-      toast.error("Preencha todos os campos obrigatórios!")
-      return false
-    }
+// ================================
+// VALIDAÇÃO YUP
+// ================================
+const schema = yup.object({
+  nome: yup
+    .string()
+    .required("O nome é obrigatório")
+    .min(3, "Digite ao menos 3 caracteres"),
 
-    if (!email.includes("@")) {
-      toast.error("Digite um e-mail válido!")
-      return false
-    }
+  cargo: yup
+    .string()
+    .required("O cargo é obrigatório"),
 
-    if (resumo.length < 10) {
-      toast.error("Resumo muito curto!")
-      return false
-    }
+  email: yup
+    .string()
+    .email("Digite um e-mail válido")
+    .required("O e-mail é obrigatório"),
 
-    return true
-  }
+  telefone: yup
+    .string()
+    .required("O telefone é obrigatório")
+    .min(15, "Telefone inválido"),
 
-  // =========================
-  // SALVAR CURRÍCULO
-  // =========================
-  function salvarCurriculo() {
+  cpf: yup
+    .string()
+    .required("O CPF é obrigatório")
+    .min(14, "CPF inválido"),
 
-    // valida antes de salvar
-    if (!validarFormulario()) return
+  resumo: yup
+    .string()
+    .required("O resumo profissional é obrigatório")
+    .min(20, "Digite um resumo maior"),
 
-    const novoCurriculo = {
-      id: Date.now(),
-      nome,
-      cargo,
-      email,
-      telefone,
-      cpf,
-      resumo,
-      experiencias,
-      formacoes,
-      habilidades
-    }
+  experiencias: yup
+    .string()
+    .required("As experiências são obrigatórias"),
 
-    // pega currículos existentes
-    const curriculosSalvos = JSON.parse(
-      localStorage.getItem("curriculos") || "[]"
-    )
+  formacoes: yup
+    .string()
+    .required("As formações são obrigatórias"),
 
-    // adiciona novo currículo
-    curriculosSalvos.push(novoCurriculo)
+  habilidades: yup
+    .string()
+    .required("As habilidades são obrigatórias"),
+});
 
-    // salva novamente
-    localStorage.setItem(
-      "curriculos",
-      JSON.stringify(curriculosSalvos)
-    )
+export default function NovoCurriculoPage() {
 
-    toast.success("Currículo salvo com sucesso!")
+  // ================================
+  // REACT HOOK FORM
+  // ================================
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: {
+      errors,
+      isSubmitting,
+    },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-    // limpa formulário
-    setNome("")
-    setCargo("")
-    setEmail("")
-    setTelefone("")
-    setCpf("")
-    setResumo("")
+  // ================================
+  // SUBMIT
+  // ================================
+  function onSubmit(data: any) {
 
-    setExperiencias([
-      {
-        empresa: "",
-        cargo: ""
-      }
-    ])
+    console.log(data);
 
-    setFormacoes([
-      {
-        instituicao: "",
-        curso: ""
-      }
-    ])
+    // SONNER
+    toast.success(
+      "Currículo cadastrado com sucesso!"
+    );
 
-    setHabilidades([])
-  }
-
-  // =========================
-  // EXPERIÊNCIAS
-  // =========================
-  function addExperiencia() {
-
-    setExperiencias([
-      ...experiencias,
-      {
-        empresa: "",
-        cargo: ""
-      }
-    ])
-  }
-
-  function removeExperiencia(index: number) {
-
-    const novaLista = experiencias.filter(
-      (_, i) => i !== index
-    )
-
-    setExperiencias(novaLista)
-  }
-
-  function updateExperiencia(
-    index: number,
-    campo: "empresa" | "cargo",
-    valor: string
-  ) {
-
-    const lista = [...experiencias]
-
-    lista[index][campo] = valor
-
-    setExperiencias(lista)
-  }
-
-  // =========================
-  // FORMAÇÕES
-  // =========================
-  function addFormacao() {
-
-    setFormacoes([
-      ...formacoes,
-      {
-        instituicao: "",
-        curso: ""
-      }
-    ])
-  }
-
-  function removeFormacao(index: number) {
-
-    const novaLista = formacoes.filter(
-      (_, i) => i !== index
-    )
-
-    setFormacoes(novaLista)
-  }
-
-  function updateFormacao(
-    index: number,
-    campo: "instituicao" | "curso",
-    valor: string
-  ) {
-
-    const lista = [...formacoes]
-
-    lista[index][campo] = valor
-
-    setFormacoes(lista)
-  }
-
-  // =========================
-  // HABILIDADES
-  // =========================
-  function addHabilidade() {
-
-    if (!novaHabilidade.trim()) return
-
-    setHabilidades([
-      ...habilidades,
-      novaHabilidade
-    ])
-
-    setNovaHabilidade("")
-  }
-
-  function removeHabilidade(index: number) {
-
-    const novaLista = habilidades.filter(
-      (_, i) => i !== index
-    )
-
-    setHabilidades(novaLista)
+    reset();
   }
 
   return (
+    <main className="min-h-screen bg-slate-50">
 
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+      <Header />
 
-      {/* =========================
-          TÍTULO
-      ========================= */}
+      <section className="container mx-auto max-w-5xl px-6 py-10">
 
-      <h1 className="text-3xl font-bold">
-        Novo Currículo
-      </h1>
+        {/* CARD */}
+        <div className="rounded-3xl bg-white p-8 shadow-xl">
 
-      {/* =========================
-          CAMPOS PRINCIPAIS
-      ========================= */}
+          {/* TOPO */}
+          <div className="mb-10">
 
-      <input
-        className="input"
-        placeholder="Nome completo"
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
-      />
+            <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+              Cadastro de Currículo
+            </span>
 
-      <input
-        className="input"
-        placeholder="Cargo desejado"
-        value={cargo}
-        onChange={(e) => setCargo(e.target.value)}
-      />
+            <h1 className="mt-6 text-5xl font-black tracking-tight text-slate-900">
+              Novo candidato
+            </h1>
 
-      <input
-        className="input"
-        placeholder="E-mail"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      {/* TELEFONE COM MÁSCARA */}
-      <InputMask
-        mask="(99) 99999-9999"
-        value={telefone}
-        onChange={(e: { target: { value: SetStateAction<string> } }) => setTelefone(e.target.value)}
-      >
-        {(inputProps: any) => (
-
-          <input
-            {...inputProps}
-            className="input"
-            placeholder="Telefone"
-          />
-
-        )}
-      </InputMask>
-
-      {/* CPF COM MÁSCARA */}
-      <InputMask
-        mask="999.999.999-99"
-        value={cpf}
-        onChange={(e: { target: { value: SetStateAction<string> } }) => setCpf(e.target.value)}
-      >
-        {(inputProps: any) => (
-
-          <input
-            {...inputProps}
-            className="input"
-            placeholder="CPF"
-          />
-
-        )}
-      </InputMask>
-
-      <textarea
-        className="input min-h-[120px]"
-        placeholder="Resumo profissional"
-        value={resumo}
-        onChange={(e) => setResumo(e.target.value)}
-      />
-
-      {/* =========================
-          EXPERIÊNCIAS
-      ========================= */}
-
-      <div>
-
-        <h2 className="text-xl font-bold mb-2">
-          Experiências Profissionais
-        </h2>
-
-        {experiencias.map((exp, index) => (
-
-          <div
-            key={index}
-            className="flex gap-2 mb-2"
-          >
-
-            <input
-              className="input"
-              placeholder="Empresa"
-              value={exp.empresa}
-              onChange={(e) =>
-                updateExperiencia(
-                  index,
-                  "empresa",
-                  e.target.value
-                )
-              }
-            />
-
-            <input
-              className="input"
-              placeholder="Cargo"
-              value={exp.cargo}
-              onChange={(e) =>
-                updateExperiencia(
-                  index,
-                  "cargo",
-                  e.target.value
-                )
-              }
-            />
-
-            <button
-              onClick={() =>
-                removeExperiencia(index)
-              }
-              className="bg-red-500 text-white px-3 rounded"
-            >
-              <FaTrash />
-            </button>
+            <p className="mt-4 text-lg text-slate-500">
+              Preencha todas as informações do candidato.
+            </p>
 
           </div>
 
-        ))}
-
-        <button
-          onClick={addExperiencia}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          <FaPlus />
-          Adicionar experiência
-        </button>
-
-      </div>
-
-      {/* =========================
-          FORMAÇÕES
-      ========================= */}
-
-      <div>
-
-        <h2 className="text-xl font-bold mb-2">
-          Formações Acadêmicas
-        </h2>
-
-        {formacoes.map((form, index) => (
-
-          <div
-            key={index}
-            className="flex gap-2 mb-2"
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8"
           >
 
-            <input
-              className="input"
-              placeholder="Instituição"
-              value={form.instituicao}
-              onChange={(e) =>
-                updateFormacao(
-                  index,
-                  "instituicao",
-                  e.target.value
-                )
-              }
-            />
+            {/* GRID */}
+            <div className="grid gap-6 md:grid-cols-2">
 
-            <input
-              className="input"
-              placeholder="Curso"
-              value={form.curso}
-              onChange={(e) =>
-                updateFormacao(
-                  index,
-                  "curso",
-                  e.target.value
-                )
-              }
-            />
+              {/* NOME */}
+              <div>
 
-            <button
-              onClick={() =>
-                removeFormacao(index)
-              }
-              className="bg-red-500 text-white px-3 rounded"
-            >
-              <FaTrash />
-            </button>
+                <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                  <FaUser />
+                  Nome
+                </label>
 
-          </div>
+                <input
+                  type="text"
+                  placeholder="Digite o nome"
+                  {...register("nome")}
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 outline-none transition focus:border-blue-500 focus:bg-white"
+                />
 
-        ))}
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.nome?.message}
+                </p>
 
-        <button
-          onClick={addFormacao}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          <FaPlus />
-          Adicionar formação
-        </button>
+              </div>
 
-      </div>
+              {/* CARGO */}
+              <div>
 
-      {/* =========================
-          HABILIDADES
-      ========================= */}
+                <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                  <FaBriefcase />
+                  Cargo desejado
+                </label>
 
-      <div>
+                <input
+                  type="text"
+                  placeholder="Digite o cargo"
+                  {...register("cargo")}
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 outline-none transition focus:border-blue-500 focus:bg-white"
+                />
 
-        <h2 className="text-xl font-bold mb-2">
-          Habilidades
-        </h2>
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.cargo?.message}
+                </p>
 
-        <div className="flex gap-2">
+              </div>
 
-          <input
-            className="input"
-            placeholder="Digite uma habilidade"
-            value={novaHabilidade}
-            onChange={(e) =>
-              setNovaHabilidade(e.target.value)
-            }
-          />
+              {/* EMAIL */}
+              <div>
 
-          <button
-            onClick={addHabilidade}
-            className="bg-green-600 text-white px-4 rounded"
-          >
-            <FaPlus />
-          </button>
+                <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                  <FaEnvelope />
+                  E-mail
+                </label>
 
-        </div>
+                <input
+                  type="email"
+                  placeholder="Digite o e-mail"
+                  {...register("email")}
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 outline-none transition focus:border-blue-500 focus:bg-white"
+                />
 
-        <div className="flex flex-wrap gap-2 mt-3">
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.email?.message}
+                </p>
 
-          {habilidades.map((habilidade, index) => (
+              </div>
 
-            <div
-              key={index}
-              className="bg-zinc-200 px-3 py-1 rounded flex items-center gap-2"
-            >
+              {/* TELEFONE */}
+              <div>
 
-              {habilidade}
+                <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                  <FaPhone />
+                  Telefone
+                </label>
 
-              <button
-                onClick={() =>
-                  removeHabilidade(index)
-                }
-                className="text-red-500"
-              >
-                <FaTrash size={12} />
-              </button>
+                <InputMask
+                  mask="(99) 99999-9999"
+                  {...register("telefone")}
+                >
+                  {(inputProps: any) => (
+                    <input
+                      {...inputProps}
+                      type="text"
+                      placeholder="(00) 00000-0000"
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 outline-none transition focus:border-blue-500 focus:bg-white"
+                    />
+                  )}
+                </InputMask>
+
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.telefone?.message}
+                </p>
+
+              </div>
+
+              {/* CPF */}
+              <div className="md:col-span-2">
+
+                <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                  <FaIdCard />
+                  CPF
+                </label>
+
+                <InputMask
+                  mask="999.999.999-99"
+                  {...register("cpf")}
+                >
+                  {(inputProps: any) => (
+                    <input
+                      {...inputProps}
+                      type="text"
+                      placeholder="000.000.000-00"
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 outline-none transition focus:border-blue-500 focus:bg-white"
+                    />
+                  )}
+                </InputMask>
+
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.cpf?.message}
+                </p>
+
+              </div>
 
             </div>
 
-          ))}
+            {/* RESUMO */}
+            <div>
 
+              <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                <FaFileAlt />
+                Resumo profissional
+              </label>
+
+              <textarea
+                placeholder="Conte um resumo profissional..."
+                {...register("resumo")}
+                className="min-h-[140px] w-full rounded-xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-blue-500 focus:bg-white"
+              />
+
+              <p className="mt-2 text-sm text-red-500">
+                {errors.resumo?.message}
+              </p>
+
+            </div>
+
+            {/* EXPERIÊNCIAS */}
+            <div>
+
+              <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                <FaBriefcase />
+                Experiências profissionais
+              </label>
+
+              <textarea
+                placeholder="Descreva experiências profissionais..."
+                {...register("experiencias")}
+                className="min-h-[120px] w-full rounded-xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-blue-500 focus:bg-white"
+              />
+
+              <p className="mt-2 text-sm text-red-500">
+                {errors.experiencias?.message}
+              </p>
+
+            </div>
+
+            {/* FORMAÇÕES */}
+            <div>
+
+              <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                <FaGraduationCap />
+                Formações acadêmicas
+              </label>
+
+              <textarea
+                placeholder="Digite as formações..."
+                {...register("formacoes")}
+                className="min-h-[120px] w-full rounded-xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-blue-500 focus:bg-white"
+              />
+
+              <p className="mt-2 text-sm text-red-500">
+                {errors.formacoes?.message}
+              </p>
+
+            </div>
+
+            {/* HABILIDADES */}
+            <div>
+
+              <label className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+                <FaTools />
+                Habilidades
+              </label>
+
+              <textarea
+                placeholder="Digite as habilidades..."
+                {...register("habilidades")}
+                className="min-h-[120px] w-full rounded-xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-blue-500 focus:bg-white"
+              />
+
+              <p className="mt-2 text-sm text-red-500">
+                {errors.habilidades?.message}
+              </p>
+
+            </div>
+
+            {/* BOTÃO */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="h-14 w-full rounded-xl bg-blue-600 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSubmitting
+                ? "Salvando..."
+                : "Cadastrar currículo"}
+            </button>
+
+          </form>
         </div>
-
-      </div>
-
-      {/* =========================
-          BOTÃO SALVAR
-      ========================= */}
-
-      <button
-        onClick={salvarCurriculo}
-        className="bg-black text-white px-6 py-3 rounded hover:bg-zinc-800 transition"
-      >
-        Salvar Currículo
-      </button>
-
-    </div>
-  )
+      </section>
+    </main>
+  );
 }
