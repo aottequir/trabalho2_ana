@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalentHub — Sistema de Gerenciamento de Currículos
 
-## Getting Started
+## Sobre o projeto
 
-First, run the development server:
+O TalentHub é uma aplicação desenvolvida em Next.js com foco em gerenciamento de currículos e experiência do usuário (UX/UI). O sistema permite cadastrar, visualizar e pesquisar candidatos de forma moderna, organizada e responsiva.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+O projeto foi desenvolvido utilizando conceitos modernos de desenvolvimento front-end, validação de formulários e componentes reutilizáveis.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Funcionalidades implementadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Landing Page
 
-## Learn More
+- Página inicial moderna
+- Apresentação dos benefícios do sistema
+- Interface responsiva
+- Navegação intuitiva
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Lista de Currículos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Exibição de currículos em cards
+- Busca em tempo real
+- Filtro por nome e cargo
+- Navegação dinâmica para detalhes
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Página de Detalhes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Exibição completa das informações do candidato
+- Foto fake do usuário
+- Layout organizado e responsivo
+
+---
+
+## Cadastro de Currículos
+
+O formulário contém:
+
+- Nome
+- Cargo desejado
+- E-mail
+- Telefone
+- CPF
+- Resumo profissional
+- Experiências profissionais
+- Formações acadêmicas
+- Habilidades
+
+---
+
+# Tecnologias utilizadas
+
+## Next.js
+
+Framework React utilizado para criação da aplicação utilizando App Router.
+
+---
+
+## Tailwind CSS
+
+Biblioteca utilizada para estilização moderna e responsiva.
+
+---
+
+## React Hook Form
+
+Utilizado para gerenciamento dos formulários.
+
+---
+
+## Yup
+
+Biblioteca utilizada para validação dos campos do formulário.
+
+Exemplos de validação:
+- Campos obrigatórios
+- Formato de e-mail
+- Quantidade mínima de caracteres
+
+---
+
+## Sonner
+
+Biblioteca utilizada para notificações toast.
+
+Exemplos:
+- Sucesso ao cadastrar
+- Erro de validação
+
+---
+
+## React Icons
+
+Utilizado para ícones visuais no sistema.
+
+---
+
+## Máscaras de formulário
+
+Foram utilizadas máscaras para:
+- CPF
+- Telefone
+
+Compatíveis com React 19 e Next.js 16.
+
+---
+
+# Estrutura do Projeto
+
+```txt
+app
+├── componentes
+│   ├── footer.tsx
+│   ├── header.tsx
+│   └── nav.tsx
+│
+├── sistema/paginas/curriculos
+│   ├── [id]
+│   │   └── page.tsx
+│   │
+│   ├── novo
+│   │   └── page.tsx
+│   │
+│   └── page.tsx
+│
+├── globals.css
+├── layout.tsx
+└── page.tsx
+
+public
+└── uploads
+    ├── avatar1.png
+    └── avatar2.png
